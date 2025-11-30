@@ -51,13 +51,18 @@
                     <v-container>
                         <v-row dense class="mt-3">
                             <v-col cols="12" sm="12" md="6">
-                                <base-input label="Nombre de la Marca" v-model="v$.editedItem.nombre.$model"
+                                <base-input label="Nombre del producto" v-model="v$.editedItem.nombre.$model"
                                     :rules="v$.editedItem.nombre" outlined dense />
                             </v-col>
 
                             <v-col cols="12" sm="12" md="6">
                                 <base-input label="Modelo" v-model="v$.editedItem.modelo.$model"
                                     :rules="v$.editedItem.modelo" outlined dense />
+                            </v-col>
+
+                            <v-col cols="12" sm="12" md="6">
+                                <base-input label="Descripcion" v-model="v$.editedItem.descripcion.$model"
+                                    :rules="v$.editedItem.descripcion" outlined dense />
                             </v-col>
 
                             <v-col cols="12" sm="12" md="6">
@@ -130,9 +135,10 @@ export default {
             dialog: false,
             dialogDelete: false,
             headers: [
-                { title: "Producto", key: "nombre" },
                 { title: "Modelo", key: "modelo" },
+                { title: "Producto", key: "nombre" },
                 { title: "Marca", key: "marcaNombre" },
+                { title: "Descripcion", key: "descripcion" },
                 { title: "Accion", key: "actions", sortable: false, align: 'center' },
             ],
             search: "",
@@ -143,12 +149,14 @@ export default {
             options: {},
             editedItem: {
                 nombre: "",
+                descripcion: "",
                 modelo: "",
                 marca: "",
                 id_modelo: "",
             },
             defaultItem: {
                 nombre: "",
+                descripcion: "",
                 modelo: "",
                 marca: "",
                 id_modelo: "",
@@ -183,6 +191,10 @@ export default {
         return {
             editedItem: {
                 nombre: {
+                    required,
+                    minLength: minLength(1),
+                },
+                descripcion: {
                     required,
                     minLength: minLength(1),
                 },
@@ -260,7 +272,7 @@ export default {
 
                 try {
 
-                    const { data } = await brandsApi.put(`/update/${edited.id_marca}`, edited);
+                    const { data } = await modelProductApi.put(`/update/${edited.id_modelo}`, edited);
 
                     alert.success(data.message);
                 } catch (error) {
@@ -278,8 +290,10 @@ export default {
                 const payload = {
                     nombre: this.editedItem.nombre,
                     descripcion: this.editedItem.descripcion,
+                    modelo: this.editedItem.modelo,
+                    marca: this.editedItem.marca,
                 };
-                const { data } = await brandsApi.post('/store', payload);
+                const { data } = await modelProductApi.post('/store', payload);
 
                 alert.success(data.message);
             } catch (error) {
@@ -308,9 +322,9 @@ export default {
 
         async deleteItemConfirm() {
             try {
-                const { data } = await brandsApi.delete(`/delete/${this.editedItem.id_marca}`, {
+                const { data } = await modelProductApi.delete(`/delete/${this.editedItem.id_modelo}`, {
                     params: {
-                        id: this.editedItem.id_marca,
+                        id: this.editedItem.id_modelo,
                     },
                 });
 
