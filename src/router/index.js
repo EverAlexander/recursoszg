@@ -21,9 +21,9 @@ const router = createRouter({
       meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
     },
     {
-      path: "/test",
-      name: "test",
-      component: () => import("../views/TestView.vue"),
+      path: "/consola",
+      name: "consola",
+      component: () => import("../views/GameConsole.vue"),
       meta: { requiresAuth: false }, // add meta field to specify the route requires authentication
     },
     {
