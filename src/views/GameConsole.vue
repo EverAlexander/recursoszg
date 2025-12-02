@@ -147,11 +147,25 @@
 
                         <v-col cols="12" sm="6">
                             <v-card class="pa-3 rounded-lg border">
+                                <strong>Plataforma:</strong>
+                                <div>{{ details.modproducto }}</div>
+                            </v-card>
+                        </v-col>
+                        
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
                                 <strong>Modelo:</strong>
                                 <div>{{ details.modelo }}</div>
                             </v-card>
                         </v-col>
 
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Descripcion:</strong>
+                                <div>{{ details.modDescrip }}</div>
+                            </v-card>
+                        </v-col>
+                        
                         <v-col cols="12" sm="6">
                             <v-card class="pa-3 rounded-lg border">
                                 <strong>Color:</strong>
