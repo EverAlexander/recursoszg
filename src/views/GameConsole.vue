@@ -25,6 +25,7 @@
                 item-title="id_marca" item-value="id_marca" class="mt-4" @update:options="getDataFromApi">
                 <!-- Acciones -->
                 <template v-slot:[`item.actions`]="{ item }">
+                    <v-icon size="20" class="mr-2" icon="mdi-eye" @click="showDetails(item.raw)" />
                     <v-icon size="20" class="mr-2" @click="editItem(item.raw)" icon="mdi-pencil" />
                     <v-icon size="20" class="mr-2" @click="deleteItem(item.raw)" icon="mdi-delete" />
                 </template>
@@ -84,7 +85,6 @@
                                     :rules="v$.editedItem.id_ubicacion" outlined dense clearable />
                             </v-col>
 
-                            <!-- Observaciones como textarea ocupando todo el ancho -->
                             <v-col cols="12">
                                 <base-input label="Observaciones" v-model="v$.editedItem.observacion.$model"
                                     :rules="v$.editedItem.observacion" outlined type="textarea" rows="3" auto-grow />
@@ -119,6 +119,83 @@
                 </v-container>
             </v-card>
         </v-dialog>
+
+        <!-- Dialog Ver detalle consola -->
+        <v-dialog v-model="dialogDetails" max-width="600px" persistent>
+            <v-card class="pa-6 rounded-xl elevation-3">
+
+                <v-card-title class="d-flex flex-column align-center mb-4">
+                    <h2 class="mt-3 text-center">Detalles de la Consola</h2>
+                </v-card-title>
+
+                <v-card-text>
+                    <v-row dense>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Serial:</strong>
+                                <div>{{ details.numero_serie }}</div>
+                            </v-card>
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Activo Fijo:</strong>
+                                <div>{{ details.activofijo }}</div>
+                            </v-card>
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Modelo:</strong>
+                                <div>{{ details.modelo }}</div>
+                            </v-card>
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Color:</strong>
+                                <div>{{ details.color }}</div>
+                            </v-card>
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Estado:</strong>
+                                <div>{{ details.estado }}</div>
+                            </v-card>
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Ubicación:</strong>
+                                <div>{{ details.ubicacion }}</div>
+                            </v-card>
+                        </v-col>
+
+                        <!-- OBSERVACIONES -->
+                        <v-col cols="12" class="mt-3">
+                            <strong>Observaciones:</strong>
+                            <v-card class="pa-4 mt-2 rounded-lg border" elevation="0">
+                                <p style="white-space: pre-line; margin: 0;">
+                                    {{ details.observacion || 'Sin observaciones' }}
+                                </p>
+                            </v-card>
+                        </v-col>
+
+                    </v-row>
+
+                </v-card-text>
+
+                <!-- BOTÓN DE CIERRE -->
+                <v-card-actions class="d-flex justify-center mt-2">
+                    <base-button type="secondary" title="Cancelar" @click="closeDialogDetails" />
+                </v-card-actions>
+
+            </v-card>
+        </v-dialog>
+
+
     </div>
 </template>
 
@@ -149,17 +226,18 @@ export default {
     data() {
         return {
             selected: [],
+            details: {},
             modelos: [],
             estadoInv: [],
             ubicacions: [],
             dialog: false,
             dialogDelete: false,
+            dialogDetails: false,
             headers: [
                 { title: "Serial", key: "numero_serie" },
                 { title: "Activo Fijo", key: "activofijo" },
                 { title: "Modelo", key: "modelo" },
                 { title: "Color", key: "color" },
-                { title: "Observacion", key: "observacion" },
                 { title: "Estado", key: "estado" },
                 { title: "Ubicacion", key: "ubicacion" },
                 { title: "Accion", key: "actions", sortable: false, align: 'center' },
@@ -362,6 +440,10 @@ export default {
             });
         },
 
+        closeDialogDetails() {
+            this.dialogDetails = false;            
+        },
+
         async deleteItemConfirm() {
             try {
                 const { data } = await consolaApi.delete(`/delete/${this.editedItem.numero_serie}`, {
@@ -438,6 +520,11 @@ export default {
             } catch (error) {
                 alert.error("No se pudieron cargar las marcas.");
             }
+        },
+
+        showDetails(item) {
+            this.details = { ...item }; // copiar todo
+            this.dialogDetails = true;  // abrir modal
         },
 
         addRecord() {
