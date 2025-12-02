@@ -90,9 +90,6 @@
                                     :rules="v$.editedItem.observacion" outlined type="textarea" rows="3" auto-grow />
                             </v-col>
 
-                            <!-- Campo oculto -->
-                            <input type="hidden" v-model="v$.editedItem.id_modelo.$model" />
-
                         </v-row>
 
                         <!-- Botones centrados -->
@@ -313,7 +310,7 @@ export default {
 
                 try {
 
-                    const { data } = await modelProductApi.put(`/update/${edited.id_modelo}`, edited);
+                    const { data } = await consolaApi.put(`/update/${edited.numero_serie}`, edited);
 
                     alert.success(data.message);
                 } catch (error) {
@@ -367,7 +364,7 @@ export default {
 
         async deleteItemConfirm() {
             try {
-                const { data } = await consolaApi.delete(`/delete/${this.editedItem.id_modelo}`, {
+                const { data } = await consolaApi.delete(`/delete/${this.editedItem.numero_serie}`, {
                     params: {
                         id: this.editedItem.id_modelo,
                     },
