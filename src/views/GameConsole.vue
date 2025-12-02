@@ -50,40 +50,61 @@
                 <v-card-text>
                     <v-container>
                         <v-row dense class="mt-3">
-                            <v-col cols="12" sm="12" md="6">
-                                <base-input label="Nombre del producto" v-model="v$.editedItem.nombre.$model"
-                                    :rules="v$.editedItem.nombre" outlined dense />
+
+                            <v-col cols="12" sm="6">
+                                <base-input label="Serial" v-model="v$.editedItem.numero_serie.$model"
+                                    :rules="v$.editedItem.numero_serie" outlined dense />
                             </v-col>
 
-                            <v-col cols="12" sm="12" md="6">
-                                <base-input label="Modelo" v-model="v$.editedItem.modelo.$model"
-                                    :rules="v$.editedItem.modelo" outlined dense />
+                            <v-col cols="12" sm="6">
+                                <base-input label="Activo Fijo" v-model="v$.editedItem.activofijo.$model"
+                                    :rules="v$.editedItem.activofijo" outlined dense />
                             </v-col>
 
-                            <v-col cols="12" sm="12" md="6">
-                                <base-input label="Descripcion" v-model="v$.editedItem.descripcion.$model"
-                                    :rules="v$.editedItem.descripcion" outlined dense />
-                            </v-col>
-
-                            <v-col cols="12" sm="12" md="6">
-                                <base-select label="Marca" v-model="v$.editedItem.marca.$model" :items="marcas"
-                                    item-title="nombre" item-value="id_marca" :rules="v$.editedItem.marca" outlined
+                            <v-col cols="12" sm="6">
+                                <base-select label="Modelo" v-model="v$.editedItem.id_modelo.$model" :items="modelos"
+                                    item-title="modelo" item-value="id_modelo" :rules="v$.editedItem.id_modelo" outlined
                                     dense clearable />
                             </v-col>
 
-                            <!-- ID de Modelo oculto -->
+                            <v-col cols="12" sm="6">
+                                <base-input label="Color" v-model="v$.editedItem.color.$model"
+                                    :rules="v$.editedItem.color" outlined dense />
+                            </v-col>
+
+                            <v-col cols="12" sm="6">
+                                <base-select label="Estado" v-model="v$.editedItem.id_estado.$model" :items="estadoInv"
+                                    item-title="nombre" item-value="id_estado" :rules="v$.editedItem.id_estado" outlined
+                                    dense clearable />
+                            </v-col>
+
+                            <v-col cols="12" sm="6">
+                                <base-select label="Ubicación" v-model="v$.editedItem.id_ubicacion.$model"
+                                    :items="ubicacions" item-title="nombre" item-value="id_ubicacion"
+                                    :rules="v$.editedItem.id_ubicacion" outlined dense clearable />
+                            </v-col>
+
+                            <!-- Observaciones como textarea ocupando todo el ancho -->
+                            <v-col cols="12">
+                                <base-input label="Observaciones" v-model="v$.editedItem.observacion.$model"
+                                    :rules="v$.editedItem.observacion" outlined type="textarea" rows="3" auto-grow />
+                            </v-col>
+
+                            <!-- Campo oculto -->
                             <input type="hidden" v-model="v$.editedItem.id_modelo.$model" />
+
                         </v-row>
 
                         <!-- Botones centrados -->
                         <v-row class="mt-4">
-                            <v-col class="d-flex justify-center flex-wrap">
-                                <base-button type="primary" title="Guardar" @click="save" class="mb-2" />
-                                <base-button type="secondary" title="Cancelar" @click="close" class="ms-2 mb-2" />
+                            <v-col class="d-flex justify-center gap-3 flex-wrap">
+                                <base-button type="primary" title="Guardar" @click="save" />
+                                <base-button type="secondary" title="Cancelar" @click="close" />
                             </v-col>
                         </v-row>
                     </v-container>
                 </v-card-text>
+
             </v-card>
         </v-dialog>
 
@@ -112,8 +133,8 @@ import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, email } from "@vuelidate/validators";
 
-import modelProductApi from "@/services/GameConsole";
-//import brandsApi from "@/services/brandsApi";
+import consolaApi from "@/services/GameConsole";
+import modelProductApi from "@/services/modelProduct";
 
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -131,7 +152,9 @@ export default {
     data() {
         return {
             selected: [],
-            marcas: [],
+            modelos: [],
+            estadoInv: [],
+            ubicacions: [],
             dialog: false,
             dialogDelete: false,
             headers: [
@@ -151,18 +174,22 @@ export default {
             total: 0,
             options: {},
             editedItem: {
-                nombre: "",
-                descripcion: "",
-                modelo: "",
-                marca: "",
+                numero_serie: "",
+                activofijo: "",
                 id_modelo: "",
+                color: "",
+                observacion: "",
+                id_estado: "",
+                id_ubicacion: "",
             },
             defaultItem: {
-                nombre: "",
-                descripcion: "",
-                modelo: "",
-                marca: "",
+                numero_serie: "",
+                activofijo: "",
                 id_modelo: "",
+                color: "",
+                observacion: "",
+                id_estado: "",
+                id_ubicacion: "",
             },
             loading: false,
             debounce: 0,
@@ -193,22 +220,31 @@ export default {
     validations() {
         return {
             editedItem: {
-                nombre: {
+                numero_serie: {
                     required,
                     minLength: minLength(1),
                 },
-                descripcion: {
-                    required,
-                    minLength: minLength(1),
-                },
-                modelo: {
+                activofijo: {
                     required,
                     minLength: minLength(1),
                 },
                 id_modelo: {
+                    required,
                     minLength: minLength(1),
                 },
-                marca: { required },
+                color: {
+                    minLength: minLength(1),
+                },
+                observacion: {
+                    required
+                },
+                id_estado: {
+                    required
+                },
+                id_ubicacion: {
+                    required
+                },
+
             },
         };
     },
@@ -220,8 +256,10 @@ export default {
     },
 
     created() {
-        this.initialize(); this.getMarcas();
-
+        this.initialize();
+        this.getModelo();
+        this.getUbicacion;
+        this.getEstadosIn();
     },
 
     beforeMount() {
@@ -291,12 +329,16 @@ export default {
             try {
 
                 const payload = {
-                    nombre: this.editedItem.nombre,
-                    descripcion: this.editedItem.descripcion,
-                    modelo: this.editedItem.modelo,
-                    marca: this.editedItem.marca,
+                    numero_serie: this.editedItem.numero_serie,
+                    activofijo: this.editedItem.activofijo,
+                    id_modelo: this.editedItem.id_modelo,
+                    color: this.editedItem.color,
+                    observacion: this.editedItem.observacion,
+                    id_estado: this.editedItem.id_estado,
+                    id_ubicacion: this.editedItem.id_ubicacion,
                 };
-                const { data } = await modelProductApi.post('/store', payload);
+
+                const { data } = await consolaApi.post('/store', payload);
 
                 alert.success(data.message);
             } catch (error) {
@@ -325,7 +367,7 @@ export default {
 
         async deleteItemConfirm() {
             try {
-                const { data } = await modelProductApi.delete(`/delete/${this.editedItem.id_modelo}`, {
+                const { data } = await consolaApi.delete(`/delete/${this.editedItem.id_modelo}`, {
                     params: {
                         id: this.editedItem.id_modelo,
                     },
@@ -340,7 +382,6 @@ export default {
             this.closeDelete();
         },
 
-
         async getDataFromApi(options) {
             this.loading = true;
 
@@ -352,7 +393,7 @@ export default {
             clearTimeout(this.debounce);
             this.debounce = setTimeout(async () => {
                 try {
-                    const { data } = await modelProductApi.get("/select", {
+                    const { data } = await consolaApi.get("/select", {
                         params: {
                             ...this.options,    // page, itemsPerPage, sortBy
                             search: this.search // buscador
@@ -369,11 +410,33 @@ export default {
             }, 500);
         },
 
-        async getMarcas() {
+        async getModelo() {
             try {
-                const { data } = await brandsApi.get('/select'); // endpoint para traer marcas
+                const { data } = await modelProductApi.get('/select'); // endpoint para traer marcas
                 if (data.code === 200) {
-                    this.marcas = data.data; // array de marcas
+                    this.modelos = data.data; // array de marcas
+                }
+            } catch (error) {
+                alert.error("No se pudieron cargar las marcas.");
+            }
+        },
+
+        async getEstadosIn() {
+            try {
+                const { data } = await consolaApi.get('/selectEstados'); // endpoint para traer marcas
+                if (data.code === 200) {
+                    this.estadoInv = data.data; // array de marcas
+                }
+            } catch (error) {
+                alert.error("No se pudieron cargar las marcas.");
+            }
+        },
+
+        async getUbicacion() {
+            try {
+                const { data } = await consolaApi.get('/selectUbicacion'); // endpoint para traer marcas
+                if (data.code === 200) {
+                    this.ubicacions = data.data; // array de marcas
                 }
             } catch (error) {
                 alert.error("No se pudieron cargar las marcas.");
@@ -381,7 +444,9 @@ export default {
         },
 
         addRecord() {
-            this.getMarcas();
+            this.getModelo();
+            this.getEstadosIn();
+            this.getUbicacion();
             this.dialog = true;
             this.editedIndex = -1;
             this.editedItem = Object.assign({}, this.defaultItem);
