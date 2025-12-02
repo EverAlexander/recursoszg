@@ -28,6 +28,7 @@
                     <v-icon size="20" class="mr-2" icon="mdi-eye" @click="showDetails(item.raw)" />
                     <v-icon size="20" class="mr-2" @click="editItem(item.raw)" icon="mdi-pencil" />
                     <v-icon size="20" class="mr-2" @click="deleteItem(item.raw)" icon="mdi-delete" />
+                    
                 </template>
 
                 <!-- Sin datos -->
@@ -250,8 +251,8 @@ export default {
             headers: [
                 { title: "Serial", key: "numero_serie" },
                 { title: "Activo Fijo", key: "activofijo" },
+                { title: "Plataforma", key: "modproducto" },
                 { title: "Modelo", key: "modelo" },
-                { title: "Color", key: "color" },
                 { title: "Estado", key: "estado" },
                 { title: "Ubicacion", key: "ubicacion" },
                 { title: "Accion", key: "actions", sortable: false, align: 'center' },
