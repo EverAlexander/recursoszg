@@ -156,7 +156,7 @@
                         <v-col cols="12" sm="6">
                             <v-card class="pa-3 rounded-lg border">
                                 <strong>Modelo:</strong>
-                                <div>{{ details.modelo }}</div>
+                                <div>{{ details.nombremodelo }}</div>
                             </v-card>
                         </v-col>
 
