@@ -33,6 +33,12 @@ const router = createRouter({
       meta: { requiresAuth: false }, // add meta field to specify the route requires authentication
     },
     {
+      path: "/controles",
+      name: "controles",
+      component: () => import("../views/ControlsView.vue"),
+      meta: { requiresAuth: false }, // add meta field to specify the route requires authentication
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const brandsApi = axios.create({
+const modelo = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL + "/api/modelProduct",
 });
 
 
-export default brandsApi;
+export default modelo;
 
 //Prueba 02

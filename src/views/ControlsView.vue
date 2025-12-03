@@ -28,7 +28,7 @@
                     <v-icon size="20" class="mr-2" icon="mdi-eye" @click="showDetails(item.raw)" />
                     <v-icon size="20" class="mr-2" @click="editItem(item.raw)" icon="mdi-pencil" />
                     <v-icon size="20" class="mr-2" @click="deleteItem(item.raw)" icon="mdi-delete" />
-                    
+
                 </template>
 
                 <!-- Sin datos -->
@@ -51,7 +51,7 @@
                 <!-- Contenido del formulario -->
                 <v-card-text>
                     <v-container>
-                        <v-row dense class="mt-3">
+                        <v-row dense class="mt-1">
 
                             <v-col cols="12" sm="6">
                                 <base-input label="Serial" v-model="v$.editedItem.numero_serie.$model"
@@ -59,13 +59,13 @@
                             </v-col>
 
                             <v-col cols="12" sm="6">
-                                <base-input label="Activo Fijo" v-model="v$.editedItem.activofijo.$model"
-                                    :rules="v$.editedItem.activofijo" outlined dense />
+                                <base-input label="Detalle" v-model="v$.editedItem.descripcion.$model"
+                                    :rules="v$.editedItem.descripcion" outlined dense />
                             </v-col>
 
                             <v-col cols="12" sm="6">
-                                <base-select label="Modelo" v-model="v$.editedItem.id_modelo.$model" :items="modelos"
-                                    item-title="modelo" item-value="id_modelo" :rules="v$.editedItem.id_modelo" outlined
+                                <base-select label="Modelo" v-model="v$.editedItem.modelo.$model" :items="modelosContr"
+                                    item-title="modelo" item-value="id_modelo" :rules="v$.editedItem.modelo" outlined
                                     dense clearable />
                             </v-col>
 
@@ -82,18 +82,25 @@
 
                             <v-col cols="12" sm="6">
                                 <base-select label="Ubicación" v-model="v$.editedItem.id_ubicacion.$model"
-                                    :items="ubicacions" item-title="nombre" item-value="id_ubicacion"
+                                    :items="ubication" item-title="nombre" item-value="id_ubicacion"
                                     :rules="v$.editedItem.id_ubicacion" outlined dense clearable />
                             </v-col>
 
-                            <v-col cols="12">
+                            <v-col cols="12" sm="6">
+                                <base-input label="Fecha de Actualización" type="date"
+                                    v-model="v$.editedItem.fechaActualizacion.$model"
+                                    :rules="v$.editedItem.fechaActualizacion" outlined dense />
+                            </v-col>
+
+                            <!-- Observaciones -->
+                            <v-col cols="12" class="mt-2">
                                 <base-input label="Observaciones" v-model="v$.editedItem.observacion.$model"
                                     :rules="v$.editedItem.observacion" outlined type="textarea" rows="3" auto-grow />
                             </v-col>
 
                         </v-row>
 
-                        <!-- Botones centrados -->
+                        <!-- Botones -->
                         <v-row class="mt-4">
                             <v-col class="d-flex justify-center gap-3 flex-wrap">
                                 <base-button type="primary" title="Guardar" @click="save" />
@@ -107,7 +114,7 @@
         </v-dialog>
 
         <!-- Dialog Eliminar -->
-        <v-dialog v-model="dialogDelete" max-width="400px">
+        <v-dialog v-model="dialogDelete" max-width="400px" persistent>
             <v-card class="pa-4">
                 <v-container>
                     <h3 class="black-secondary text-center mb-4">Eliminar registro</h3>
@@ -141,18 +148,11 @@
 
                         <v-col cols="12" sm="6">
                             <v-card class="pa-3 rounded-lg border">
-                                <strong>Activo Fijo:</strong>
-                                <div>{{ details.activofijo }}</div>
-                            </v-card>
-                        </v-col>
-
-                        <v-col cols="12" sm="6">
-                            <v-card class="pa-3 rounded-lg border">
                                 <strong>Plataforma:</strong>
                                 <div>{{ details.modproducto }}</div>
                             </v-card>
                         </v-col>
-                        
+
                         <v-col cols="12" sm="6">
                             <v-card class="pa-3 rounded-lg border">
                                 <strong>Modelo:</strong>
@@ -166,7 +166,7 @@
                                 <div>{{ details.modDescrip }}</div>
                             </v-card>
                         </v-col>
-                        
+
                         <v-col cols="12" sm="6">
                             <v-card class="pa-3 rounded-lg border">
                                 <strong>Color:</strong>
@@ -187,6 +187,14 @@
                                 <div>{{ details.ubicacion }}</div>
                             </v-card>
                         </v-col>
+
+                        <v-col cols="12" sm="6">
+                            <v-card class="pa-3 rounded-lg border">
+                                <strong>Agregado:</strong>
+                                <div>{{ details.fechaActualizacion }}</div>
+                            </v-card>
+                        </v-col>
+
 
                         <!-- OBSERVACIONES -->
                         <v-col cols="12" class="mt-3">
@@ -222,7 +230,7 @@ import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, email } from "@vuelidate/validators";
 
-import consolaApi from "@/services/GameConsole";
+import controlsApi from "@/services/ControlsApi";
 import modelProductApi from "@/services/modelProduct";
 
 import BaseButton from "../components/base-components/BaseButton.vue";
@@ -242,17 +250,17 @@ export default {
         return {
             selected: [],
             details: {},
-            modelos: [],
+            modelosContr: [],
             estadoInv: [],
-            ubicacions: [],
+            ubication: [],
             dialog: false,
             dialogDelete: false,
             dialogDetails: false,
             headers: [
                 { title: "Serial", key: "numero_serie" },
-                { title: "Activo Fijo", key: "activofijo" },
+                { title: "Descripcion", key: "descripcion" },
                 { title: "Plataforma", key: "modproducto" },
-                { title: "Modelo", key: "modelo" },
+                { title: "Modelo", key: "nombremodelo" },
                 { title: "Estado", key: "estado" },
                 { title: "Ubicacion", key: "ubicacion" },
                 { title: "Accion", key: "actions", sortable: false, align: 'center' },
@@ -260,26 +268,28 @@ export default {
             search: "",
             records: [],
             editedIndex: -1,
-            title: "Consola de Video juegos",
+            title: "Controles",
             total: 0,
             options: {},
             editedItem: {
                 numero_serie: "",
-                activofijo: "",
-                id_modelo: "",
+                descripcion: "",
+                modelo: "",
                 color: "",
-                observacion: "",
                 id_estado: "",
                 id_ubicacion: "",
+                observacion: "",
+                fechaActualizacion: "",
             },
             defaultItem: {
                 numero_serie: "",
-                activofijo: "",
-                id_modelo: "",
+                descripcion: "",
+                modelo: "",
                 color: "",
-                observacion: "",
                 id_estado: "",
                 id_ubicacion: "",
+                observacion: "",
+                fechaActualizacion: "",
             },
             loading: false,
             debounce: 0,
@@ -314,24 +324,27 @@ export default {
                     required,
                     minLength: minLength(1),
                 },
-                activofijo: {
+                descripcion: {
                     required,
                     minLength: minLength(1),
                 },
-                id_modelo: {
+                modelo: {
                     required,
                     minLength: minLength(1),
                 },
                 color: {
                     minLength: minLength(1),
                 },
-                observacion: {
-                    required
-                },
                 id_estado: {
                     required
                 },
                 id_ubicacion: {
+                    required
+                },
+                observacion: {
+                    required
+                },
+                fechaActualizacion: {
                     required
                 },
 
@@ -376,6 +389,8 @@ export default {
         editItem(item) {
             this.editedIndex = this.records.indexOf(item);
             this.editedItem = Object.assign({}, item);
+
+
             this.getModelo();
             this.getEstadosIn();
             this.getUbicacion();
@@ -406,7 +421,7 @@ export default {
 
                 try {
 
-                    const { data } = await consolaApi.put(`/update/${edited.numero_serie}`, edited);
+                    const { data } = await controlsApi.put(`/update/${edited.numero_serie}`, edited);
 
                     alert.success(data.message);
                 } catch (error) {
@@ -423,15 +438,16 @@ export default {
 
                 const payload = {
                     numero_serie: this.editedItem.numero_serie,
-                    activofijo: this.editedItem.activofijo,
-                    id_modelo: this.editedItem.id_modelo,
+                    descripcion: this.editedItem.descripcion,
+                    modelo: this.editedItem.modelo,
                     color: this.editedItem.color,
-                    observacion: this.editedItem.observacion,
                     id_estado: this.editedItem.id_estado,
                     id_ubicacion: this.editedItem.id_ubicacion,
+                    observacion: this.editedItem.observacion,
+                    fechaActualizacion: this.editedItem.fechaActualizacion,
                 };
 
-                const { data } = await consolaApi.post('/store', payload);
+                const { data } = await controlsApi.post('/store', payload);
 
                 alert.success(data.message);
             } catch (error) {
@@ -459,12 +475,12 @@ export default {
         },
 
         closeDialogDetails() {
-            this.dialogDetails = false;            
+            this.dialogDetails = false;
         },
 
         async deleteItemConfirm() {
             try {
-                const { data } = await consolaApi.delete(`/delete/${this.editedItem.numero_serie}`, {
+                const { data } = await controlsApi.delete(`/delete/${this.editedItem.numero_serie}`, {
                     params: {
                         id: this.editedItem.id_modelo,
                     },
@@ -490,7 +506,7 @@ export default {
             clearTimeout(this.debounce);
             this.debounce = setTimeout(async () => {
                 try {
-                    const { data } = await consolaApi.get("/select", {
+                    const { data } = await controlsApi.get("/select", {
                         params: {
                             ...this.options,    // page, itemsPerPage, sortBy
                             search: this.search // buscador
@@ -509,34 +525,34 @@ export default {
 
         async getModelo() {
             try {
-                const { data } = await modelProductApi.get('/select'); // endpoint para traer marcas
+                const { data } = await modelProductApi.get('/select');
                 if (data.code === 200) {
-                    this.modelos = data.data; // array de marcas
+                    this.modelosContr = data.data; // array de modelo
                 }
             } catch (error) {
-                alert.error("No se pudieron cargar las marcas.");
+                alert.error("No se pudieron cargar los modelos.");
             }
         },
 
         async getEstadosIn() {
             try {
-                const { data } = await consolaApi.get('/selectEstados'); // endpoint para traer marcas
+                const { data } = await controlsApi.get('/selectEstados'); // endpoint para traer marcas
                 if (data.code === 200) {
                     this.estadoInv = data.data; // array de marcas
                 }
             } catch (error) {
-                alert.error("No se pudieron cargar las marcas.");
+                alert.error("No se pudieron cargar los estados.");
             }
         },
 
         async getUbicacion() {
             try {
-                const { data } = await consolaApi.get('/selectUbicacion'); // endpoint para traer marcas
+                const { data } = await controlsApi.get('/selectUbication'); // endpoint para traer marcas
                 if (data.code === 200) {
-                    this.ubicacions = data.data; // array de marcas
+                    this.ubication = data.data; // array de marcas
                 }
             } catch (error) {
-                alert.error("No se pudieron cargar las marcas.");
+                alert.error("No se pudieron cargar la ubicacion.");
             }
         },
 
