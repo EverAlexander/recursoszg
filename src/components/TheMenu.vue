@@ -11,6 +11,13 @@
           <v-icon icon="mdi-home" size="25"></v-icon>
           <span>Inicio</span>
         </RouterLink>
+
+        <RouterLink to="/consola" class="d-flex flex-column align-center mb-4">
+          <v-icon icon="mdi-archive" size="25"></v-icon>
+          <span>Equipos</span>
+        </RouterLink>
+
+
         <RouterLink to="/" class="d-flex flex-column align-center mb-4" @click="logout()">
           <v-icon icon="mdi-logout" size="25"></v-icon>
           <span>Cerrar sesión</span>
