@@ -17,7 +17,7 @@
           v-if="isLoggedIn"
         >
           <span
-            >{{ user.name }} <v-icon icon="mdi-account" color="#2D52A8"
+            >{{ user.name}} <v-icon icon="mdi-account" color="#2D52A8"
           /></span>
           <a href="#" @click="logout()"><b>Cerrar sesión</b></a>
         </div>

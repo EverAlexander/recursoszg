@@ -5,6 +5,7 @@
         <v-icon icon="mdi-menu mt-1" :size="45"></v-icon>
       </a>
     </div>
+
     <div class="menu-options mt-3 text-center">
       <template v-if="isLoggedIn">
         <RouterLink to="/" class="d-flex flex-column align-center mb-4">
@@ -12,17 +13,18 @@
           <span>Inicio</span>
         </RouterLink>
 
-        <RouterLink to="/consola" class="d-flex flex-column align-center mb-4">
+        <RouterLink to="/consola" class="d-flex flex-column align-center mb-4" v-if="user?.rol === 'Administrador'">
           <v-icon icon="mdi-archive" size="25"></v-icon>
           <span>Equipos</span>
         </RouterLink>
-
 
         <RouterLink to="/" class="d-flex flex-column align-center mb-4" @click="logout()">
           <v-icon icon="mdi-logout" size="25"></v-icon>
           <span>Cerrar sesión</span>
         </RouterLink>
       </template>
+
+
       <template v-else>
         <RouterLink to="/" class="d-flex flex-column align-center mb-4">
           <v-icon icon="mdi-login" size="25"></v-icon>
@@ -33,9 +35,16 @@
           <span>Registrarse</span>
         </RouterLink> -->
       </template>
+
+      <!--v-if="user?.rol === 'Usuario'" asi dependera del rol que se validara-->
+      
+
     </div>
   </div>
 </template>
+
+
+
 
 <script setup>
 import { RouterLink } from "vue-router";
@@ -43,7 +52,9 @@ import useMenu from "@/composables/useMenu";
 import useAuth from "../composables/useAuth";
 
 const { stateSideBar } = useMenu();
-const { isLoggedIn, logout } = useAuth();
+const { isLoggedIn, logout, user } = useAuth();
+
+
 </script>
 
 <style lang="scss">
