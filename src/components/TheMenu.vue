@@ -18,6 +18,11 @@
           <span>Equipos</span>
         </RouterLink>
 
+        <RouterLink to="/role" class="d-flex flex-column align-center mb-4" v-if="user?.rol === 'Administrador'">
+          <v-icon icon="mdi-archive" size="25"></v-icon>
+          <span>Roles</span>
+        </RouterLink>
+
         <RouterLink to="/" class="d-flex flex-column align-center mb-4" @click="logout()">
           <v-icon icon="mdi-logout" size="25"></v-icon>
           <span>Cerrar sesión</span>
