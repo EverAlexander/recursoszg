@@ -8,25 +8,71 @@
 
     <div class="menu-options mt-3 text-center">
       <template v-if="isLoggedIn">
+
         <RouterLink to="/" class="d-flex flex-column align-center mb-4">
           <v-icon icon="mdi-home" size="25"></v-icon>
           <span>Inicio</span>
         </RouterLink>
 
-        <RouterLink to="/consola" class="d-flex flex-column align-center mb-4" v-if="user?.rol === 'Administrador'">
-          <v-icon icon="mdi-archive" size="25"></v-icon>
-          <span>Equipos</span>
-        </RouterLink>
+        <v-menu location="end" open-on-hover v-if="user?.rol === 'Administrador'">
+          <template v-slot:activator="{ props }">
+            <div class="d-flex flex-column align-center mb-4" v-bind="props">
+              <v-icon icon="mdi-account" size="20"></v-icon>
+              <span>Usuario</span>
+            </div>
+          </template>
 
-        <RouterLink to="/role" class="d-flex flex-column align-center mb-4" v-if="user?.rol === 'Administrador'">
-          <v-icon icon="mdi-archive" size="25"></v-icon>
-          <span>Roles</span>
-        </RouterLink>
+          <v-list density="compact" variant="plain" class="my-list pt-2 pb-2">
+            <RouterLink to="/role">
+              <v-list-item>
+                Roles
+              </v-list-item>
+            </RouterLink>
+
+            <RouterLink to="/users">
+              <v-list-item>
+                Integrantes
+              </v-list-item>
+            </RouterLink>
+
+          </v-list>
+        </v-menu>
+
+        <v-menu location="end" open-on-hover v-if="user?.rol === 'Administrador'">
+          <template v-slot:activator="{ props }">
+            <div class="d-flex flex-column align-center mb-4" v-bind="props">
+              <v-icon icon="mdi-clipboard-list" size="20"></v-icon>
+              <span>Inventario</span>
+            </div>
+          </template>
+
+          <v-list density="compact" variant="plain" class="my-list pt-2 pb-2">
+            <RouterLink to="/">
+              <v-list-item>
+                Marcas
+              </v-list-item>
+            </RouterLink>
+
+            <RouterLink to="/">
+              <v-list-item>
+                Modelos
+              </v-list-item>
+            </RouterLink>
+
+            <RouterLink to="/">
+              <v-list-item>
+                Equipos
+              </v-list-item>
+            </RouterLink>
+
+          </v-list>
+        </v-menu>
 
         <RouterLink to="/" class="d-flex flex-column align-center mb-4" @click="logout()">
           <v-icon icon="mdi-logout" size="25"></v-icon>
           <span>Cerrar sesión</span>
         </RouterLink>
+
       </template>
 
 
@@ -42,7 +88,7 @@
       </template>
 
       <!--v-if="user?.rol === 'Usuario'" asi dependera del rol que se validara-->
-      
+
 
     </div>
   </div>
@@ -66,7 +112,7 @@ const { isLoggedIn, logout, user } = useAuth();
 @import "@/assets/styles/variables.scss";
 
 .menu-sidebar {
-  width: 6rem;
+  width: 8rem;
   height: 100vh;
   position: fixed;
   top: 0;
@@ -75,33 +121,35 @@ const { isLoggedIn, logout, user } = useAuth();
   font-size: 16px;
 }
 
-.menu-sidebar a {
+.menu-sidebar a,
+.menu-sidebar div {
   color: white;
 }
 
+.menu-options a:hover,
+.menu-options div:hover {
+  color: #E0E5F1;
+  background-color: #474F7A;
+  //border-radius: 10px;
+}
+
+.my-list {
+  background-color: #3C486B !important;
+}
+
+.my-list a {
+  color: #F0F0F0 !important;
+}
+
+.my-list .v-list-item:hover {
+  color: white !important;
+  background-color: #82B1FF;
+}
+
 .inactive {
-  left: -6rem;
+  left: -8rem;
   animation: linear;
   animation-name: hideMenu;
-  animation-duration: 0.4s;
-}
-
-@keyframes hideMenu {
-  0% {
-    left: 0;
-    transform: translateX(0);
-  }
-
-  100% {
-    left: -6rem;
-    transform: translateX(-6rem);
-  }
-}
-
-.active {
-  left: 0;
-  animation: linear;
-  animation-name: showMenu;
   animation-duration: 0.4s;
 }
 

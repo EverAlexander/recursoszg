@@ -7,9 +7,6 @@
                     <v-col>
                         <h2 class="black-secondary">{{ title }}</h2>
                     </v-col>
-                    <v-col class="d-flex justify-end">
-                        <base-button type="primary" title="Agregar" @click="addRecord()" />
-                    </v-col>
                 </v-row>
 
                 <!-- Campo Buscar -->
@@ -47,11 +44,17 @@
                 </v-card-title>
 
                 <v-card-text>
-                    <base-input label="Rol" v-model="v$.editedItem.name.$model" :rules="v$.editedItem.name" outlined
-                        dense />
-                    <input type="hidden" v-model="v$.editedItem.idRol.$model" />
+                    <v-row justify="center">
+                        <v-col cols="12">
+                            <base-select label="Rol" v-model="v$.editedItem.idRol.$model" :items="roles"
+                                item-title="name" item-value="idRol" :rules="v$.editedItem.idRol" outlined dense
+                                clearable />
+                            <input type="hidden" v-model="v$.editedItem.idUser.$model" />
+                        </v-col>
+                    </v-row>
                 </v-card-text>
 
+                <!-- Botones centrados -->
                 <v-card-actions class="justify-center">
                     <base-button type="primary" title="Guardar" @click="save" />
                     <base-button type="secondary" title="Cancelar" @click="close" class="ms-2" />
@@ -81,6 +84,7 @@ import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, email } from "@vuelidate/validators";
 
+import usersApi from "@/services/usersApi";
 import rolapi from "@/services/rolApi";
 
 import BaseButton from "../components/base-components/BaseButton.vue";
@@ -99,26 +103,34 @@ export default {
     data() {
         return {
             selected: [],
+            roles: [],
             dialog: false,
             dialogDelete: false,
             headers: [
-                { title: "Id", key: "idRol" },
-                { title: "Rol", key: "name" },
-                { title: "Creacion", key: "created_at" },
+                { title: "Id", key: "idUser" },
+                { title: "Nombre", key: "name" },
+                { title: "Correo", key: "email" },
+                { title: "Rol", key: "rol" },
                 { title: "Accion", key: "actions", sortable: false, align: 'center' },
             ],
             search: "",
             records: [],
             editedIndex: -1,
-            title: "Roles",
+            title: "Integrantes",
             total: 0,
             options: {},
             editedItem: {
-                name: "",
+                //name: "",
+                //email: "",
+                //rol: "",
+                idUser: "",
                 idRol: "",
             },
             defaultItem: {
-                name: "",
+                //name: "",
+                //email: "",
+                //rol: "",
+                idUser: "",
                 idRol: "",
             },
             loading: false,
@@ -150,11 +162,12 @@ export default {
     validations() {
         return {
             editedItem: {
-                name: {
-                    required,
+                idUser: {
                     minLength: minLength(1),
-                },
+                }
+                ,
                 idRol: {
+                    required,
                     minLength: minLength(1),
                 }
             },
@@ -169,6 +182,7 @@ export default {
 
     created() {
         this.initialize();
+        this.getRol();
     },
 
     beforeMount() {
@@ -294,19 +308,12 @@ export default {
             clearTimeout(this.debounce);
             this.debounce = setTimeout(async () => {
                 try {
-                    const { data } = await rolapi.get(null, {
+                    const { data } = await usersApi.get(null, {
                         params: {
                             ...this.options,
                             search: this.search
                         },
                     });
-
-                    // 🔹 Imprime la respuesta completa
-                    console.log("Respuesta completa del API:", data);
-
-                    // 🔹 Si quieres ver solo data.data y total
-                    console.log("data.data:", data.data);
-                    console.log("data.total:", data.total);
 
                     this.records = data.data;
                     this.total = data.total;
@@ -321,7 +328,20 @@ export default {
         },
 
 
+        async getRol() {
+            try {
+                const { data } = await rolapi.get(); // endpoint para traer roles
+
+                // Asigna directamente el array de roles
+                this.roles = data.data;
+            } catch (error) {
+                alert.error("No se pudieron cargar los roles.");
+            }
+        },
+
+
         addRecord() {
+            this.getRol();
             this.dialog = true;
             this.editedIndex = -1;
             this.editedItem = Object.assign({}, this.defaultItem);
